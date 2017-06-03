@@ -15,7 +15,8 @@ logging.basicConfig(stream=sys.stderr, format='%(asctime)s [%(name)s:%(levelname
 
 HSession = requests.Session()
 
-re_mdlink = re.compile(r'\[(.+?)\]\(.+?\)')
+re_mdescape = re.compile(r'([\[\*_])')
+mdescape = lambda s: re_mdescape.sub(r'\\\1', s)
 
 class BotAPIFailed(Exception):
     def __init__(self, ret):
@@ -111,8 +112,11 @@ def message_handler(cli, msg):
             ret = "Failed to fetch data. Please try again later."
         if not ret:
             return
-        cli.sendMessage(chat_id=msg['chat']['id'], text=ret,
-                        parse_mode='Markdown', disable_web_page_preview=True)
+        try:
+            cli.sendMessage(chat_id=msg['chat']['id'], text=ret,
+                            parse_mode='Markdown', disable_web_page_preview=True)
+        except Exception:
+            logging.exception('Failed to send: ' + ret)
 
 def cmd_pkgver(cli, msg, expr):
     package = expr.strip()
@@ -123,7 +127,7 @@ def cmd_pkgver(cli, msg, expr):
     req = HSession.get(url, timeout=10, headers=apiheader)
     d = req.json()
     if req.status_code == 404:
-        return d['error']
+        return mdescape(d['error'])
     req.raise_for_status()
     pkg = d['pkg']
     text = ['Package: [%s](%s)' % (package, url2),
