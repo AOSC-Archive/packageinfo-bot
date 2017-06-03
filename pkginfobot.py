@@ -116,6 +116,8 @@ def message_handler(cli, msg):
 
 def cmd_pkgver(cli, msg, expr):
     package = expr.strip()
+    if not package:
+        return
     url = cli.config['API']['endpoint'] + 'packages/' + package
     url2 = cli.config['API']['urlhead'] + 'packages/' + package
     req = HSession.get(url, timeout=10, headers=apiheader)
