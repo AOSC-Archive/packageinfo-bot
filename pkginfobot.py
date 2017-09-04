@@ -132,13 +132,14 @@ def cmd_pkgver(cli, msg, expr):
     pkg = d['pkg']
     text = ['Package: [%s](%s)' % (package, url2),
             'source: ' + pkg.get('full_version', 'missing')]
-    repos = collections.OrderedDict.fromkeys(pkg['repo'])
-    for version, dpkgs in pkg['dpkg_matrix']:
+    repos = collections.OrderedDict()
+    for repo, dpkgs in pkg['dpkg_matrix']:
         for dpkg in dpkgs:
-            if not dpkg:
+            if not dpkg or dpkg['reponame'] in repos:
                 continue
-            elif not repos[dpkg['repo']]:
-                repos[dpkg['repo']] = version
+            else:
+                repos[dpkg['reponame']] = version + (
+                    ' (testing)' if dpkg['testing'] else '')
     text.extend('%s: %s' % kv for kv in repos.items())
     return '\n'.join(text)
 
