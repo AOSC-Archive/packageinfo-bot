@@ -138,7 +138,7 @@ def cmd_pkgver(cli, msg, expr):
             if not dpkg or dpkg['reponame'] in repos:
                 continue
             else:
-                repos[dpkg['reponame']] = version + (
+                repos[dpkg['reponame']] = dpkg['version'] + (
                     ' (testing)' if dpkg['testing'] else '')
     text.extend('%s: %s' % kv for kv in repos.items())
     return '\n'.join(text)
