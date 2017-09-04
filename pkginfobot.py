@@ -135,11 +135,10 @@ def cmd_pkgver(cli, msg, expr):
     repos = collections.OrderedDict()
     for repo, dpkgs in pkg['dpkg_matrix']:
         for dpkg in dpkgs:
-            if not dpkg or dpkg['reponame'] in repos:
+            if not dpkg or dpkg['repo'] in repos:
                 continue
             else:
-                repos[dpkg['reponame']] = dpkg['version'] + (
-                    ' (testing)' if dpkg['testing'] else '')
+                repos[dpkg['repo']] = dpkg['version']
     text.extend('%s: %s' % kv for kv in repos.items())
     return '\n'.join(text)
 
