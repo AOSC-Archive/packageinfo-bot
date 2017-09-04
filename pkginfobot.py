@@ -131,7 +131,7 @@ def cmd_pkgver(cli, msg, expr):
     req.raise_for_status()
     pkg = d['pkg']
     text = ['Package: [%s](%s)' % (package, url2),
-            'source: ' + pkg.get('full_version', 'missing')]
+            'source: ' + (pkg.get('full_version') or 'missing')]
     repos = collections.OrderedDict()
     for repo, dpkgs in pkg['dpkg_matrix']:
         for dpkg in dpkgs:
