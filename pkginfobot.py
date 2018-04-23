@@ -153,8 +153,8 @@ def cmd_search(cli, msg, expr):
     package = expr.strip()
     if not package:
         return
-    url = cli.config['API']['endpoint'] + 'search/' + package
-    url2 = cli.config['API']['urlhead'] + 'search/' + package
+    url = cli.config['API']['endpoint'] + ('search/?q=%s&noredir=1' % package)
+    url2 = cli.config['API']['urlhead'] + ('search/?q=%s&noredir=1' % package)
     req = HSession.get(url, timeout=10, headers=apiheader)
     d = req.json()
     if req.status_code == 404:
