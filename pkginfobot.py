@@ -135,7 +135,7 @@ def cmd_pkgver(cli, msg, expr):
     req.raise_for_status()
     pkg = d['pkg']
     text = ['Package: [%s](%s)' % (package, url2),
-            'source: ' + (pkg.get('full_version') or 'missing')]
+            '*source*: ' + (pkg.get('full_version') or 'missing')]
     repos = collections.OrderedDict()
     for repo, dpkgs in pkg['dpkg_matrix']:
         for dpkg in dpkgs:
@@ -143,7 +143,7 @@ def cmd_pkgver(cli, msg, expr):
                 continue
             else:
                 repos[dpkg['repo']] = dpkg['version']
-    text.extend('%s: %s' % kv for kv in repos.items())
+    text.extend('*%s*: %s' % kv for kv in repos.items())
     if pkg.get('upstream'):
         text.append('upstream: [%s](%s)' % (
             pkg['upstream']['version'], pkg['upstream']['url']))
@@ -161,7 +161,7 @@ def cmd_search(cli, msg, expr):
         return mdescape(d['error'])
     req.raise_for_status()
     text = ['Search: [%s](%s)' % (package, url2)]
-    for pkg in d['packages']:
+    for pkg, _ in zip(d['packages'], range(5)):
         text.append('*%s* %s' % (pkg['name'], pkg['full_version']))
     return '\n'.join(text)
 
