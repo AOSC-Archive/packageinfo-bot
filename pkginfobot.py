@@ -168,7 +168,7 @@ def cmd_search(cli, msg, expr):
     return '\n'.join(text)
 
 def cmd_updreq(cli, msg, expr):
-    url = cli.config['API']['endpoint'] + ('srcupd/aosc-os-abbs?page=all'
+    url = cli.config['API']['endpoint'] + 'srcupd/aosc-os-abbs?page=all'
     req = HSession.get(url, timeout=10, headers=apiheader)
     d = req.json()
     if req.status_code == 404:
