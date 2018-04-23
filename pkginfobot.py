@@ -5,6 +5,7 @@ import re
 import sys
 import time
 import json
+import random
 import logging
 import collections
 import configparser
@@ -103,6 +104,7 @@ def message_handler(cli, msg):
     cmds = {
         'pkgver': cmd_pkgver,
         'search': cmd_search,
+        'updreq': cmd_updreq,
         'start': lambda *args: None
     }
     if not cmd:
@@ -145,7 +147,7 @@ def cmd_pkgver(cli, msg, expr):
                 repos[dpkg['repo']] = dpkg['version']
     text.extend('*%s*: %s' % kv for kv in repos.items())
     if pkg.get('upstream'):
-        text.append('upstream: [%s](%s)' % (
+        text.append('*upstream*: [%s](%s)' % (
             pkg['upstream']['version'], pkg['upstream']['url']))
     return '\n'.join(text)
 
@@ -163,6 +165,21 @@ def cmd_search(cli, msg, expr):
     text = ['Search: [%s](%s)' % (package, url2)]
     for pkg, _ in zip(d['packages'], range(5)):
         text.append('*%s* %s' % (pkg['name'], pkg['full_version']))
+    return '\n'.join(text)
+
+def cmd_updreq(cli, msg, expr):
+    url = cli.config['API']['endpoint'] + ('srcupd/aosc-os-abbs?page=all'
+    req = HSession.get(url, timeout=10, headers=apiheader)
+    d = req.json()
+    if req.status_code == 404:
+        return mdescape(d['error'])
+    req.raise_for_status()
+    text = []
+    for pkg in random.sample(d['packages'], 5):
+        text.append('*%s* [%s](%s) → [%s](%s)' % (
+            pkg['name'], pkg['version'],
+            cli.config['API']['urlhead'] + 'packages/' + pkg['name'],
+            pkg['upstream_version'], pkg['upstream_url']))
     return '\n'.join(text)
 
 def load_config(filename):
