@@ -100,7 +100,11 @@ apiheader = {'X-Requested-With': 'XMLHttpRequest'}
 def message_handler(cli, msg):
     msgtext = msg.get('text', '')
     cmd, expr = cli.parse_cmd(msgtext)
-    cmds = {'pkgver': cmd_pkgver, 'start': lambda *args: None}
+    cmds = {
+        'pkgver': cmd_pkgver,
+        'search': cmd_search,
+        'start': lambda *args: None
+    }
     if not cmd:
         return
     elif cmd in cmds:
@@ -140,6 +144,25 @@ def cmd_pkgver(cli, msg, expr):
             else:
                 repos[dpkg['repo']] = dpkg['version']
     text.extend('%s: %s' % kv for kv in repos.items())
+    if pkg.get('upstream'):
+        text.append('upstream: [%s](%s)' % (
+            pkg['upstream']['version'], pkg['upstream']['url']))
+    return '\n'.join(text)
+
+def cmd_search(cli, msg, expr):
+    package = expr.strip()
+    if not package:
+        return
+    url = cli.config['API']['endpoint'] + 'search/' + package
+    url2 = cli.config['API']['urlhead'] + 'search/' + package
+    req = HSession.get(url, timeout=10, headers=apiheader)
+    d = req.json()
+    if req.status_code == 404:
+        return mdescape(d['error'])
+    req.raise_for_status()
+    text = ['Search: [%s](%s)' % (package, url2)]
+    for pkg in d['packages']:
+        text.append('*%s* %s' % (pkg['name'], pkg['full_version']))
     return '\n'.join(text)
 
 def load_config(filename):
