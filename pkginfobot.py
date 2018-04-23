@@ -104,7 +104,7 @@ def message_handler(cli, msg):
     cmds = {
         'pkgver': cmd_pkgver,
         'search': cmd_search,
-        'updreq': cmd_updreq,
+        'getupdreq': cmd_getupdreq,
         'start': lambda *args: None
     }
     if not cmd:
@@ -167,7 +167,7 @@ def cmd_search(cli, msg, expr):
         text.append('*%s* %s' % (pkg['name'], pkg['full_version']))
     return '\n'.join(text)
 
-def cmd_updreq(cli, msg, expr):
+def cmd_getupdreq(cli, msg, expr):
     url = cli.config['API']['endpoint'] + 'srcupd/aosc-os-abbs?page=all'
     req = HSession.get(url, timeout=10, headers=apiheader)
     d = req.json()
