@@ -61,7 +61,8 @@ class TelegramBotClient:
         t = text.strip().replace('\xa0', ' ').split(' ', 1)
         if not t:
             return None, None
-        cmd = t[0].rsplit('@', 1)
+        if '@' in t[0]:
+            cmd = t[0].rsplit('@', 1)
         if len(cmd[0]) < 2 or cmd[0][0] != '/':
             return None, None
         if len(cmd) > 1 and cmd[-1] != self.username:
