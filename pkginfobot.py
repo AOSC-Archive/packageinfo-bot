@@ -162,7 +162,8 @@ def cmd_search(cli, msg, expr):
     if req.status_code == 404:
         return mdescape(d['error'])
     req.raise_for_status()
-    if len(d['packages'] ) == 0: return 'Sorry, no result'
+    if len(d['packages']) == 0: 
+        return 'Sorry, no result'
     text = ['Search: [%s](%s)' % (package, url2)]
     for pkg, _ in zip(d['packages'], range(5)):
         text.append('*%s* %s' % (pkg['name'], pkg['full_version']))
